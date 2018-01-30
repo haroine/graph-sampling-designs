@@ -131,3 +131,11 @@ get_snowball_sim <- function(g, n, nSimus_sample, name_stat, graph_stat) {
   
   return(df_sim_final)
 }
+
+#' Denominator for Deff
+#' @param n sample size
+#' @param N population size
+#' @param s2 variable dispersion in population
+deff_denom <- function(n, N, s2) { 
+	return( (1-n/N)*s2/n  ) 
+}
