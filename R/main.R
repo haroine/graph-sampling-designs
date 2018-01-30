@@ -3,41 +3,27 @@ library(foreach)
 library(sampling)
 library(tidyverse)
 source("R/snowball.R")
+
 #### Model graph
-N <- 10000
-nSimus_sample <- 100
+N <- 1000
+nSimus_sample <- 500
 n <- 50
 
 # set.seed(1005192119)
 
-g <- watts.strogatz.game(1, N, N*0.2, 0.4)
-# g <- barabasi.game(N, directed = F)
+# g <- watts.strogatz.game(1, N, N*0.2, 0.4)
+g <- barabasi.game(N, directed = F)
 # g <- make_ring(N, circular = T)
 # g <- graph_from_adjacency_matrix(matrix(1,nrow=N,ncol=N))
 # g <- forest.fire.game(N, 0.35, directed=F)
 # g %>% rewire(each_edge(p = .2, loops = FALSE))
-# get.adjacency(g)
 
-# transitivity(g, "local")
 # plot(g)
-
-
-# Y <- rep(1,N)
-# Y <- alpha_centrality(g)
-# X <- degree(g)
-# Y <- X + rnorm(length(X), mean(X), sd(X))
-
-stats_toestimate <- c(ecount(g), vcount(g), mean(degree(g)), 
-                      mean(alpha_centrality(g)),
-                      mean(transitivity(g, "local"), na.rm=T))
-names(stats_toestimate) <- c("order","size","degree",
-                             "centrality_mean",
-                             "clustering_mean")
 
 #### Sampling
 results_sample <- get_snowball_sim(g, n, nSimus_sample, 
-                 c("degree", "alpha_centrality", "clustering"), 
-                 list(degree(g), alpha_centrality(g), transitivity(g, "local")) )
+                 c("degree", "betweenness", "clustering"), 
+                 list(degree(g), betweenness(g), transitivity(g, "local")) )
 
 ## Compute estimators stats
 
