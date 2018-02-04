@@ -12,7 +12,7 @@ n <- 50
 # set.seed(1005192119)
 
 # g <- watts.strogatz.game(1, N, N*0.2, 0.4)
-g <- barabasi.game(N, directed = F)
+# g <- barabasi.game(N, directed = F)
 # g <- make_ring(N, circular = T)
 # g <- graph_from_adjacency_matrix(matrix(1,nrow=N,ncol=N))
 # g <- forest.fire.game(N, 0.35, directed=F)
@@ -20,40 +20,10 @@ g <- barabasi.game(N, directed = F)
 
 # plot(g)
 
-#### Sampling
-results_sample <- get_snowball_sim(g, n, nSimus_sample, 
-                 c("degree", "betweenness", "clustering"), 
-                 list(degree(g), betweenness(g), transitivity(g, "local")) )
-
-## Compute estimators stats
-
-## TODO estimators stats as functions
-estimators_stats <- results_sample %>% 
-  group_by(stat_name) %>% 
-  summarise_at(vars(stat_value, se_simple, se_snowball, 
-                    bias_simple, bias_snowball,
-                    size_simple, size_snowball, stat_disp), 
-               mean, na.rm = T) 
-
-estimators_stats$var_simple <- estimators_stats$se_simple - (estimators_stats$bias_simple)**2
-estimators_stats$cv_simple <- sqrt(estimators_stats$var_simple) / abs(estimators_stats$stat_value)
-
-estimators_stats$var_snowball <- estimators_stats$se_snowball - (estimators_stats$bias_snowball)**2
-estimators_stats$cv_snowball <- sqrt(estimators_stats$var_snowball) / abs(estimators_stats$stat_value)
-
-estimators_stats$deff_simple <- estimators_stats$var_simple / 
-  deff_denom(estimators_stats$size_simple, N, estimators_stats$stat_disp)
-
-estimators_stats$deff_snowball <- estimators_stats$var_snowball / 
-  deff_denom(estimators_stats$size_snowball, N, estimators_stats$stat_disp)
+#### Simulations
+# g <- forest.fire.game(N, 0.35, directed=F
+estimators_stats <- graph_estimators(g, n, nSimus_sample, 
+                                      c("degree", "betweenness", "clustering"),
+                                      list(degree(g), betweenness(g), transitivity(g, "local")) )
 
 ## TODO Graphs Deff <-> model parameter for snowball, for various models
-
-## TODO Do the same analysis for plugin sampling
-###### Induced subgraphs
-
-# g_test <- induced_subgraph(g, test$sample_first)
-# g_test2 <- induced_subgraph(g, test$sample_snowball)
-# plot(g)
-# plot(g_test)
-# plot(g_test2)
