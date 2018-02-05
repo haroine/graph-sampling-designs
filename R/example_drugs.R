@@ -1,7 +1,7 @@
 library(igraph)
 library(foreach)
 library(sampling)
-source("snowball.R")
+source("R/snowball.R")
 #### Model graph
 N <- 25
 
