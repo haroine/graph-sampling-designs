@@ -24,11 +24,16 @@ g <- barabasi.game(N, directed = F)
 # plot(g)
 
 #### Simulations
-param_vec <- seq(0.05, 1, by=0.05)
+# param_vec <- seq(0.05, 1, by=0.05)
+# param_vec <- seq(1, 10, by=1)
+param_vec <- seq(0.01, 0.3, by=0.01)
+ambs <- 1
+# fwprob <- 0.4
 
 estimators_stats <- foreach(param=param_vec, .combine=rbind) %do% {
   print(param)
-  g <- forest.fire.game(N, param, directed=F)
+  g <- forest.fire.game(nodes = N, fw.prob = param, 
+                        ambs = ambs, directed=F)
   name <- "forest_fire"
   parameter <- param
   graph_estimators(g, n, nSimus_sample, name, parameter,
@@ -38,5 +43,5 @@ estimators_stats <- foreach(param=param_vec, .combine=rbind) %do% {
   
 }
 
-saveRDS(estimators_stats, file="ff_040218.rds")
-## TODO Graphs Deff <-> model parameter for snowball, for various models
+saveRDS(estimators_stats, file="ff_fwprob_100218_by_001.rds")
+

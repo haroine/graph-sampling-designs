@@ -1,11 +1,14 @@
 library(tidyverse)
 library(foreach)
+library(sampling)
 
-## TODO doc
-## TODO output graph from snowball sample
-## Only for 1-degree snowball sampling
-## method_first: "srwsor", "bernoulli", "pps" (Poisson proportional-to-size),
-## "fixed.pps"
+#' Draw a (1-degree) snowball sample and compute weights
+#' @param g population graph (igraph object)
+#' @param n size of the initial sample
+#' @param method_first Can be "srwsor" (simple random sampling without replacement), 
+#' "bernoulli", "pps" (Poisson proportional-to-size),
+#' "fixed.pps" (fixed size unequal probability sampling)
+#' @param X size vector to determing pps probabilities
 snowball_sample <- function(g, n, method_first="bernoulli", X=NULL) {
   
   N <- vcount(g)
@@ -42,7 +45,6 @@ snowball_sample <- function(g, n, method_first="bernoulli", X=NULL) {
   })
   weights <- 1/(1-(1-n/N)**weights)
   
-  ## TODO name results
   return(list(sample_snowball=sample_snowball, 
               weights=weights, sample_first=sample_first, 
               weights_first=weights_first))
