@@ -26,22 +26,25 @@ g <- barabasi.game(N, directed = F)
 #### Simulations
 # param_vec <- seq(0.05, 1, by=0.05)
 # param_vec <- seq(1, 10, by=1)
-param_vec <- seq(0.01, 0.3, by=0.01)
+param_vec <- seq(0.01, 0.01, by=0.01)
 ambs <- 1
 # fwprob <- 0.4
+
+method_first <- "poisson.pps"
+X <- betweenness(g)
 
 estimators_stats <- foreach(param=param_vec, .combine=rbind) %do% {
   print(param)
   g <- forest.fire.game(nodes = N, fw.prob = param, 
                         ambs = ambs, directed=F)
-  name <- "forest_fire"
+  name <- "forest_fire_X_deg"
   parameter <- param
   graph_estimators(g, n, nSimus_sample, name, parameter,
-                                       c("degree", "betweenness", "clustering"),
-                                       list(degree(g), betweenness(g), transitivity(g, "local")) )
+         c("degree", "betweenness", "clustering"),
+         list(degree(g), betweenness(g), transitivity(g, "local")),
+         method_first = method_first, X = X)
   
   
 }
 
-saveRDS(estimators_stats, file="ff_fwprob_100218_by_001.rds")
-
+saveRDS(estimators_stats, file="ff_fwprob_100218_X_btwn.rds")

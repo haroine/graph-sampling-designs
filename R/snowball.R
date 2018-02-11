@@ -20,30 +20,49 @@ snowball_sample <- function(g, n, method_first="bernoulli", X=NULL) {
   }
   
   if(method_first == "poisson.pps" && !is.null(X)) {
-    piks <- inclusionprobabilities(X, n)  ## pps
+    
+    if(length(X[X == 0]) > 0) {
+      piks <- inclusionprobabilities(X+0.01, n)  ## pps
+    } else {
+      piks <- inclusionprobabilities(X, n)  ## pps
+    }
+    
     sample_first <- which(UPpoisson(piks) == 1)
   }
   
-  if(method_first == "srswor") {
-    sample_first <- srswor(n, N)
-  }
-  
-  if(method_first == "fixed.pps" && !is.null(X)) {
-    piks <- inclusionprobabilities(X, n)  ## pps
-    sample_first <- which(UPsystematic(piks) == 1)
-  }
+  # if(method_first == "srswor") {
+  #   sample_first <- srswor(n, N)
+  # }
+  # 
+  # if(method_first == "fixed.pps" && !is.null(X)) {
+  #   piks <- inclusionprobabilities(X, n)  ## pps
+  #   sample_first <- which(UPsystematic(piks) == 1)
+  # }
   
   weights_first <- 1/(piks[sample_first])
   
   sample_snowball <- unique(c(sample_first,
                               unlist(adjacent_vertices(g,sample_first, mode="out"))))
   
-  weights <- sapply(sample_snowball, function(x) {
-    length(unique(c(x,
-                    unlist(adjacent_vertices(graph = g, v = x, mode = "in"))))
-    )
-  })
-  weights <- 1/(1-(1-n/N)**weights)
+  if(method_first == "bernoulli") {
+
+    ## In degree of every vertex in snowball sample
+    indeg <- sapply(sample_snowball, function(x) {
+      length(unique(c(x,
+                      unlist(adjacent_vertices(graph = g, v = x, mode = "in"))))
+      )
+    })
+    
+    weights <- 1/(1-(1-n/N)**indeg)
+  }
+  
+  if(method_first == "poisson.pps" && !is.null(X)) {
+    
+    weights <- sapply(sample_snowball, function(x) {
+      before <- unique(c(x,adjacent_vertices(graph = g, v = x, mode = "in")[[1]]))
+      return(1/(1-prod(1-piks[before])))
+    })
+  }
   
   return(list(sample_snowball=sample_snowball, 
               weights=weights, sample_first=sample_first, 
@@ -99,7 +118,8 @@ estimators_snowball <- function(graph_stat, snowball_sample, N) {
 #' Simulations
 #' @param graph_stat list of vecs of size N with stat value for each vertex 
 get_snowball_sim <- function(g, n, nSimus_sample,
-                             name_stat, graph_stat) {
+                             name_stat, graph_stat, 
+                             method_first="bernoulli", X=NULL) {
   
   ## TODO rewrite not using rbinds
   
@@ -112,7 +132,8 @@ get_snowball_sim <- function(g, n, nSimus_sample,
   for(k in 1:length(name_stat)) {
     
     matrix_sims <-     foreach(j=1:nSimus_sample, .combine=rbind) %do% {
-      snowball_sample_obj <- snowball_sample(g, n)
+      snowball_sample_obj <- snowball_sample(g, n, 
+                       method_first = method_first, X = X)
       c(name_stat[k], estimators_snowball(graph_stat[[k]], snowball_sample_obj, vcount(g)) )
     }
     
@@ -179,11 +200,13 @@ get_estimators_stats <- function(results_sample, name, parameter) {
 #' Wrapper to get simulations of graph sampling design
 #' efficiency
 graph_estimators <- function(g, n, nSimus_sample, name, parameter,
-                             name_stat, graph_stat) {
+                             name_stat, graph_stat,
+                             method_first="bernoulli", X=NULL) {
   
   results_sample <- get_snowball_sim(g, n, nSimus_sample, 
                                      name_stat, 
-                                     graph_stat )
+                                     graph_stat, 
+                                     method_first = method_first, X = X)
   
   return(get_estimators_stats(results_sample, name, parameter))
 }
