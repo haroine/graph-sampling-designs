@@ -21,9 +21,12 @@ snowball_sample <- function(g, n, method_first="bernoulli", X=NULL) {
   
   if(method_first == "poisson.pps" && !is.null(X)) {
     
-    if(length(X[X == 0]) > 0) {
-      piks <- inclusionprobabilities(X+0.01, n)  ## pps
+    if(length(X[X <= 0]) > 0) {
+      piks <- abs(X)+0.01
+      piks[is.na(piks)] <- 0.01
+      piks <- inclusionprobabilities(piks, n)  ## pps
     } else {
+      piks <- X
       piks <- inclusionprobabilities(X, n)  ## pps
     }
     
@@ -209,4 +212,49 @@ graph_estimators <- function(g, n, nSimus_sample, name, parameter,
                                      method_first = method_first, X = X)
   
   return(get_estimators_stats(results_sample, name, parameter))
+}
+
+
+#' Get graph estimators for a sequence of varying fw.prob
+#' @param fwprob_vec vector of fw.prob
+graph_estimators_param_fwprob <- function(fwprob_vec,
+                                          g, n, nSimus_sample, name,
+                                          name_stat, graph_stat,
+                                          method_first = method_first, X = X) {
+  
+  estimators_stats <- foreach(param=fwprob_vec, .combine=rbind) %do% {
+    print(param)
+    g <- forest.fire.game(nodes = N, fw.prob = param, 
+                          ambs = ambs, directed=F)
+    parameter <- param
+    graph_estimators(g, n, nSimus_sample, name, parameter,
+                     c("degree", "betweenness", "clustering","max_path_length"),
+                     list(degree(g), betweenness(g), transitivity(g, "local"), max_path_length(g)),
+                     method_first = method_first, X = X)
+    
+    
+  }
+  
+  return(estimators_stats)
+  
+}
+
+
+#' Browse list of fw.prob and pps sampling design,
+#' get estimators
+#' @param list_X, name list of vectors for pps sampling design
+graph_estimators_fwprob_pps <- function(list_X, fwprob_vec,
+                                        g, n, nSimus_sample,
+                                        name_stat, graph_stat) {
+  
+  foreach(k=1:(length(list_X)), .combine=rbind) %do% {
+    currentX <- list_X[[k]]
+    current_name <- names(list_X)[k]
+    print(paste("----", current_name))
+    graph_estimators_param_fwprob(fwprob_vec,
+                                  g, n, nSimus_sample, current_name,
+                                  name_stat, graph_stat,
+                                  method_first = "poisson.pps", X = currentX)
+  }
+  
 }

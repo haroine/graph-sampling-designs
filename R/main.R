@@ -3,16 +3,17 @@ library(foreach)
 library(sampling)
 library(tidyverse)
 source("R/snowball.R")
+source("R/metrics.R")
 
 #### Model graph
 N <- 1000
 nSimus_sample <- 500
 n <- 50
 
-# set.seed(1005192119)
+set.seed(1005192119)
 
 # g <- watts.strogatz.game(1, N, N*0.2, 0.4)
-g <- barabasi.game(N, directed = F)
+# g <- barabasi.game(N, directed = F)
 # g <- make_ring(N, circular = T)
 # g <- graph_from_adjacency_matrix(matrix(1,nrow=N,ncol=N))
 # g <- forest.fire.game(N, 0.35, directed=F)
@@ -26,25 +27,21 @@ g <- barabasi.game(N, directed = F)
 #### Simulations
 # param_vec <- seq(0.05, 1, by=0.05)
 # param_vec <- seq(1, 10, by=1)
-param_vec <- seq(0.01, 0.01, by=0.01)
 ambs <- 1
 # fwprob <- 0.4
 
-method_first <- "poisson.pps"
-X <- betweenness(g)
+list_X <- list(betweenness(g), degree(g), transitivity(g, "local"), max_path_length(g),
+               1/(betweenness(g)+0.01), 1/(degree(g)+0.01), 1/(transitivity(g, "local")+0.01), 1/(max_path_length(g)+0.01))
+names(list_X) <- c("betweenness", "degree", "clustering", 
+                   "max_path_length", "inv_betweenness", "inv_degree",
+                   "inv_clustering", "inv_max_path_length")
 
-estimators_stats <- foreach(param=param_vec, .combine=rbind) %do% {
-  print(param)
-  g <- forest.fire.game(nodes = N, fw.prob = param, 
-                        ambs = ambs, directed=F)
-  name <- "forest_fire_X_deg"
-  parameter <- param
-  graph_estimators(g, n, nSimus_sample, name, parameter,
-         c("degree", "betweenness", "clustering"),
-         list(degree(g), betweenness(g), transitivity(g, "local")),
-         method_first = method_first, X = X)
-  
-  
-}
+name_stat <- c("degree", "betweenness", "clustering", "max_path_length")
+graph_stat <- list(degree(g), betweenness(g), transitivity(g, "local"), max_path_length(g))
+fwprob_vec <- seq(0.01, 0.30, by=0.01)
 
-saveRDS(estimators_stats, file="ff_fwprob_100218_X_btwn.rds")
+estimators_stats <- graph_estimators_fwprob_pps(list_X, fwprob_vec,
+        g, n, nSimus_sample,
+        name_stat, graph_stat)
+
+saveRDS(estimators_stats, file="ff_fwprob_11022018_pps.rds")
