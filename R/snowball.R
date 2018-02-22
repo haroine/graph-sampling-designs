@@ -228,8 +228,8 @@ graph_estimators_param_fwprob <- function(fwprob_vec,
                           ambs = ambs, directed=F)
     parameter <- param
     graph_estimators(g, n, nSimus_sample, name, parameter,
-                     c("degree", "betweenness", "clustering","max_path_length"),
-                     list(degree(g), betweenness(g), transitivity(g, "local"), max_path_length(g)),
+                     name_stat,
+                     graph_stat,
                      method_first = method_first, X = X)
     
     

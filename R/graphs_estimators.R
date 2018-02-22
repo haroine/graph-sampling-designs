@@ -1,10 +1,9 @@
 library(tidyverse)
 
-# ff_estimators <- readRDS("ff_ambs_100218.rds")
-ff_estimators <- readRDS("ff_fwprob_11022018_pps.rds")
-estimators_stats <- ff_estimators
+# ff_estimators <- readRDS("ff_fwprob_18022018_pps.rds")
+# estimators_stats <- ff_estimators
 
-plot_deff <- ggplot(data = estimators_stats %>% filter(name=="max_path_length"), 
+plot_deff <- ggplot(data = estimators_stats %>% filter(name=="page_rank"), 
                     aes(x=parameter)) +
   geom_line(aes(y=deff_snowball, colour=stat_name)) +
   # geom_line(aes(y=deff_simple, colour=stat_name)) +

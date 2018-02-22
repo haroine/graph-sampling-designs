@@ -30,18 +30,33 @@ set.seed(1005192119)
 ambs <- 1
 # fwprob <- 0.4
 
-list_X <- list(betweenness(g), degree(g), transitivity(g, "local"), max_path_length(g),
-               1/(betweenness(g)+0.01), 1/(degree(g)+0.01), 1/(transitivity(g, "local")+0.01), 1/(max_path_length(g)+0.01))
-names(list_X) <- c("betweenness", "degree", "clustering", 
-                   "max_path_length", "inv_betweenness", "inv_degree",
-                   "inv_clustering", "inv_max_path_length")
+# list_X <- list(betweenness(g), degree(g), transitivity(g, "local"), max_path_length(g),
+#                1/(betweenness(g)+0.01), 1/(degree(g)+0.01), 1/(transitivity(g, "local")+0.01), 1/(max_path_length(g)+0.01))
+# names(list_X) <- c("betweenness", "degree", "clustering", 
+#                    "max_path_length", "inv_betweenness", "inv_degree",
+#                    "inv_clustering", "inv_max_path_length")
+# name_stat <- c("degree", "betweenness", "clustering", "max_path_length")
+# graph_stat <- list(degree(g), betweenness(g), transitivity(g, "local"), max_path_length(g))
 
-name_stat <- c("degree", "betweenness", "clustering", "max_path_length")
-graph_stat <- list(degree(g), betweenness(g), transitivity(g, "local"), max_path_length(g))
+
+list_X <- list(closeness(g), betweenness(g), degree(g), page_rank(g)$vector, eigen_centrality(g)$vector)
+names(list_X) <- c("closeness", "betweenness", "degree", "page_rank", "eigen")
+
+graph_stat <- list(closeness(g), betweenness(g), degree(g), page_rank(g)$vector, eigen_centrality(g)$vector)
+name_stat <- c("closeness", "betweenness", "degree", "page_rank", "eigen")
+
 fwprob_vec <- seq(0.01, 0.30, by=0.01)
 
 estimators_stats <- graph_estimators_fwprob_pps(list_X, fwprob_vec,
         g, n, nSimus_sample,
         name_stat, graph_stat)
 
-saveRDS(estimators_stats, file="ff_fwprob_11022018_pps.rds")
+saveRDS(estimators_stats, file="ff_fwprob_19022018_pps.rds")
+
+## Conclusions from ff_fwprob_18022018_pps.rds:
+## - only efficient to measure betweenneess
+## - Efficient sampling designs: betweenness, degree (centralities?)
+
+## TODO characterisation of ff model
+## - Distance between top 2 units in degrees, in function of fwprobs
+## - Local / Global clustering in function of fwprobs
