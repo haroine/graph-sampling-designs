@@ -38,20 +38,33 @@ ambs <- 1
 # name_stat <- c("degree", "betweenness", "clustering", "max_path_length")
 # graph_stat <- list(degree(g), betweenness(g), transitivity(g, "local"), max_path_length(g))
 
+# list_X <- list(closeness(g), betweenness(g), degree(g), page_rank(g)$vector, eigen_centrality(g)$vector)
+# names(list_X) <- c("closeness", "betweenness", "degree", "page_rank", "eigen")
 
-list_X <- list(closeness(g), betweenness(g), degree(g), page_rank(g)$vector, eigen_centrality(g)$vector)
-names(list_X) <- c("closeness", "betweenness", "degree", "page_rank", "eigen")
+# graph_stat <- list(closeness(g), betweenness(g), degree(g), page_rank(g)$vector, eigen_centrality(g)$vector)
+# name_stat <- c("closeness", "betweenness", "degree", "page_rank", "eigen")
 
-graph_stat <- list(closeness(g), betweenness(g), degree(g), page_rank(g)$vector, eigen_centrality(g)$vector)
-name_stat <- c("closeness", "betweenness", "degree", "page_rank", "eigen")
+graph_stat <- list(closeness(g), max_path_length(g), page_rank(g)$vector, eigen_centrality(g)$vector)
+name_stat <- c("closeness", "max_path_length",  "page_rank", "eigen")
 
 fwprob_vec <- seq(0.01, 0.30, by=0.01)
 
-estimators_stats <- graph_estimators_fwprob_pps(list_X, fwprob_vec,
-        g, n, nSimus_sample,
-        name_stat, graph_stat)
+# estimators_stats <- graph_estimators_fwprob_pps(list_X, fwprob_vec,
+#         g, n, nSimus_sample,
+#         name_stat, graph_stat)
 
-# saveRDS(estimators_stats, file="ff_fwprob_19022018_pps.rds")
+
+supplement_ff_simple <- graph_estimators_param_fwprob(fwprob_vec,
+                              g, n, nSimus_sample, "forest_fire",
+                              name_stat, graph_stat, method_first = "bernoulli")
+
+## TODO: merge with forestfire_simple.rds
+ff_simple <- readRDS("data/forestfire_simple.rds")
+ff_simple_tot <- rbind(ff_simple, supplement_ff_simple)
+
+## TODO: sort
+
+# saveRDS(ff_simple_tot, file="data/forestfire_simple.rds")
 
 ## Conclusions from ff_fwprob_18022018_pps.rds:
 ## - only efficient to measure betweenneess

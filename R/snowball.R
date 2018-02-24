@@ -221,7 +221,8 @@ graph_estimators <- function(g, n, nSimus_sample, name, parameter,
 graph_estimators_param_fwprob <- function(fwprob_vec,
                                           g, n, nSimus_sample, name,
                                           name_stat, graph_stat,
-                                          method_first = method_first, X = X) {
+                                          method_first=method_first, X=X,
+                                          ambs=1 ) {
   
   estimators_stats <- foreach(param=fwprob_vec, .combine=rbind) %do% {
     print(param)
