@@ -16,7 +16,7 @@ set.seed(1005192119)
 # g <- barabasi.game(N, directed = F)
 # g <- make_ring(N, circular = T)
 # g <- graph_from_adjacency_matrix(matrix(1,nrow=N,ncol=N))
-# g <- forest.fire.game(N, 0.35, directed=F)
+g <- forest.fire.game(N, 0.3, directed=F)
 # g %>% rewire(each_edge(p = .2, loops = FALSE))
 
 # name <- "BA"
@@ -51,7 +51,7 @@ estimators_stats <- graph_estimators_fwprob_pps(list_X, fwprob_vec,
         g, n, nSimus_sample,
         name_stat, graph_stat)
 
-saveRDS(estimators_stats, file="ff_fwprob_19022018_pps.rds")
+# saveRDS(estimators_stats, file="ff_fwprob_19022018_pps.rds")
 
 ## Conclusions from ff_fwprob_18022018_pps.rds:
 ## - only efficient to measure betweenneess

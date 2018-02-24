@@ -124,6 +124,7 @@ get_snowball_sim <- function(g, n, nSimus_sample,
                              name_stat, graph_stat, 
                              method_first="bernoulli", X=NULL) {
   
+  N <- vcount(g)
   ## TODO rewrite not using rbinds
   
   if(length(name_stat) != length(graph_stat)) {
@@ -192,10 +193,10 @@ get_estimators_stats <- function(results_sample, name, parameter) {
   estimators_stats$cv_snowball <- sqrt(estimators_stats$var_snowball) / abs(estimators_stats$stat_value)
   
   estimators_stats$deff_simple <- estimators_stats$var_simple / 
-    deff_denom(estimators_stats$size_simple, N, estimators_stats$stat_disp)
+    deff_denom(estimators_stats$size_simple, vcount(g), estimators_stats$stat_disp)
   
   estimators_stats$deff_snowball <- estimators_stats$var_snowball / 
-    deff_denom(estimators_stats$size_snowball, N, estimators_stats$stat_disp)
+    deff_denom(estimators_stats$size_snowball, vcount(g), estimators_stats$stat_disp)
   
   return(estimators_stats)
 }
