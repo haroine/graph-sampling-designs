@@ -1,10 +1,9 @@
 library(tidyverse)
 
-ff_estimators <- readRDS("data/forestfire_simple.rds")
-ff_estimators <- readRDS("data/forestfire_pps_centralities.rds")
+ff_estimators <- readRDS("data/forestfire_snowball.rds")
 estimators_stats <- ff_estimators
 
-df_toplot <- estimators_stats %>% filter(name=="degree")
+df_toplot <- estimators_stats %>% filter(name=="inv_clustering")
 # df_toplot <- estimators_stats
 
 plot_deff <- ggplot(data = df_toplot
