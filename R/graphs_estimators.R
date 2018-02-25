@@ -1,9 +1,13 @@
 library(tidyverse)
 
 ff_estimators <- readRDS("data/forestfire_simple.rds")
+ff_estimators <- readRDS("data/forestfire_pps_centralities.rds")
 estimators_stats <- ff_estimators
 
-plot_deff <- ggplot(data = estimators_stats #%>% filter(name=="clustering")
+df_toplot <- estimators_stats %>% filter(name=="degree")
+# df_toplot <- estimators_stats
+
+plot_deff <- ggplot(data = df_toplot
                     , aes(x=parameter)) +
   geom_line(aes(y=deff_snowball, colour=stat_name)) +
   # geom_line(aes(y=deff_simple, colour=stat_name)) +
