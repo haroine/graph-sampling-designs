@@ -19,22 +19,30 @@ g <- yeast
 # names(list_X) <- c("closeness", "betweenness")
 
 
-list_X <- list(closeness(g), betweenness(g), degree(g), page_rank(g)$vector,
-               eigen_centrality(g)$vector, transitivity(g, "local"))
-names(list_X) <- c("closeness", "betweenness", "degree", "page_rank",
-                   "eigen", "clustering")
+# list_X <- list(NULL, closeness(g), betweenness(g), degree(g), page_rank(g)$vector,
+#                eigen_centrality(g)$vector, transitivity(g, "local"))
+# names(list_X) <- c("bernoulli", "closeness", "betweenness", "degree"
+#                    , "page_rank", "eigen", "clustering")
 
-graph_stat <- list_X
-name_stat <- names(list_X)
+graph_stat <- list(closeness(g), betweenness(g), degree(g), page_rank(g)$vector,
+                   eigen_centrality(g)$vector, transitivity(g, "local"))
+name_stat <- c("closeness", "betweenness", "degree"
+               , "page_rank", "eigen", "clustering")
+
 parameter <- "yeast"
-method_first <- "poisson.pps"
+# method_first <- c("bernoulli")
 
-yeast_estimators <- foreach(k=1:(length(list_X)), .combine=rbind) %do% {
+list_X <- list(NULL)
+method_first_vec <- c("bernoulli")
+
+yeast_estimators_bernoulli <- foreach(k=1:(length(list_X)), .combine=rbind) %do% {
     currentX <- list_X[[k]]
     current_name <- names(list_X)[k]
+    method_first <- method_first_vec[k]
     print(paste("----", current_name))
+    print(method_first)
     
-    cuurent_df <- graph_estimators(g, n, nSimus_sample, current_name, parameter,
+    current_df <- graph_estimators(g, n, nSimus_sample, current_name, parameter,
                      name_stat,
                      graph_stat,
                      method_first = method_first, X = currentX)
@@ -42,6 +50,6 @@ yeast_estimators <- foreach(k=1:(length(list_X)), .combine=rbind) %do% {
 }
 
 
-saveRDS(yeast_estimators, file="yeast_23022018_pps.rds")
+saveRDS(current_df, "data/yeast_estimators_bernoulli.rds")
 
   
