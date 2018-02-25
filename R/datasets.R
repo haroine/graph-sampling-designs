@@ -1,27 +1,20 @@
 
-#' @name forestfire_ambs
+#' @name forestfire_snowball
 #' @title 
-#' @description Used to compute snowball sample size with Bernoulli first 
-#' with ambs varying from 1 to 10 by 1
+#' @description All deffs and other stats for all auxiliary variables
+#' (+bernoulli) and all stats of interest
+#' with all fwprobs from 0.01 to 0.30 by 0.01
 NULL
 
-#' @name forestfire_fwprob_all
+#' @name forestfire_parameters
 #' @title 
 #' @description Used to compute snowball sample size with Bernoulli first
-#' with fwprobs from 0.05 to 0.95 by 0.05
+#' with fwprobs from 0.05 to 0.95 by 0.05 (ambs = 1) 
+#' and ambs from 1 to 10 by 1 (fwprobs=0.35)
 NULL
 
-#' @name forestfire_pps_all.rds
-#' @description Compute deffs for snowball with pps first with various auxiliary
-#' variables on forestfire with fwprobs varying from 0.01 to 0.30, by 0.01
-NULL
-
-#' @name forestfire_pps_centralities.rds
-#' @description Compute deffs for snowball with pps first with centralities as
-#' auxiliary variables on forestfire with fwprobs varying from 0.01 to 0.30, by 0.01
-NULL
-
-#' @name yeast_centralities.rds
-#' @description Compute deffs for snowball with pps first with centralities as
-#' auxiliary variables on yeast graph
+#' @name yeast_snowball
+#' @description Compute deffs for snowball all designs
+#' (bernoulli + auxiliary variables) for all stats of interest
+#' for yeast network
 NULL
