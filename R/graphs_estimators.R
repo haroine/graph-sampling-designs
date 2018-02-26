@@ -1,6 +1,6 @@
 library(tidyverse)
 
-ff_estimators <- readRDS("data/forestfire_snowball.rds")
+ff_estimators <- readRDS("data/forestfire_parameters.rds")
 estimators_stats <- ff_estimators
 
 df_toplot <- estimators_stats %>% filter(name=="inv_clustering")
