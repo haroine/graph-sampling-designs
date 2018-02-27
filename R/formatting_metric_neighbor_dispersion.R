@@ -1,4 +1,4 @@
 
-metrics_real <- readRDS("data/intra_cor_real_graphs.rds")
+metrics_real <- readRDS("data/deffs_networks.rds")
 
 test <- gather(metrics_real)
