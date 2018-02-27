@@ -29,8 +29,37 @@ simple_neigh_sim <- function(v, graph_stat) {
      mean(graph_stat, na.rm=T))**2
 }
 
+deff_estimator_1 <- function(g, graph_stat) {
+  mean(sapply(1:vcount(g), neigh_sim, graph_stat = graph_stat), na.rm = T) /
+    mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = graph_stat), na.rm = T)
+}
+
+deff_estimator_2 <- function(g, graph_stat) {
+  mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = graph_stat), na.rm = T) /
+    mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = betweenness(g)), na.rm = T)
+}
+
+get_deffs_byvar <- function(g) {
+  
+  c(deff_estimator_1(g, betweenness(g)),
+  deff_estimator_1(g, closeness(g)),
+  deff_estimator_1(g, page_rank(g)[[1]]),
+  deff_estimator_1(g, transitivity(g, "local")),
+  deff_estimator_1(g, max_path_length(g)),
+  deff_estimator_1(g, degree(g)),
+  deff_estimator_1(g, eigen_centrality(g)$vector),
+  deff_estimator_2(g, betweenness(g)),
+  deff_estimator_2(g, closeness(g)),
+  deff_estimator_2(g, page_rank(g)[[1]]),
+  deff_estimator_2(g, transitivity(g, "local")),
+  deff_estimator_2(g, max_path_length(g)),
+  deff_estimator_2(g, degree(g)),
+  deff_estimator_2(g, eigen_centrality(g)$vector)
+  )
+}
+
 N <- 1000
-nSimus <- 500
+nSimus <- 25
 param_vec <- seq(0.05, 0.30, by=0.05)
 
 intra_cor_ff <- foreach(k=1:length(param_vec), .combine=rbind) %do% {
@@ -41,28 +70,7 @@ intra_cor_ff <- foreach(k=1:length(param_vec), .combine=rbind) %do% {
     g <- forest.fire.game(N, param_vec[k], directed=F)
     c(
   param_vec[k],
-  mean(sapply(1:vcount(g), neigh_sim, graph_stat = betweenness(g)), na.rm = T),
-  mean(sapply(1:vcount(g), neigh_sim, graph_stat = closeness(g)), na.rm = T),
-  mean(sapply(1:vcount(g), neigh_sim, graph_stat = page_rank(g)[[1]]), na.rm = T),
-  mean(sapply(1:vcount(g), neigh_sim, graph_stat = transitivity(g, "local")), na.rm = T),
-  mean(sapply(1:vcount(g), neigh_sim, graph_stat = max_path_length(g)), na.rm = T),
-  mean(sapply(1:vcount(g), neigh_sim, graph_stat = degree(g)), na.rm = T),
-  mean(sapply(1:vcount(g), neigh_sim, graph_stat = eigen_centrality(g)$vector), na.rm = T),
-  mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = betweenness(g)), na.rm = T),
-  mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = closeness(g)), na.rm = T),
-  mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = page_rank(g)[[1]]), na.rm = T),
-  mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = transitivity(g, "local")), na.rm = T),
-  mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = max_path_length(g)), na.rm = T),
-  mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = degree(g)), na.rm = T),
-  mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = eigen_centrality(g)$vector), na.rm = T),
-  mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = betweenness(g)), na.rm = T),
-  mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = closeness(g)), na.rm = T),
-  mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = page_rank(g)[[1]]), na.rm = T),
-  mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = transitivity(g, "local")), na.rm = T),
-  mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = max_path_length(g)), na.rm = T),
-  mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = degree(g)), na.rm = T),
-  mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = eigen_centrality(g)$vector), na.rm = T),
-  mean(sapply(1:vcount(g), simple_deg_homogeneity), na.rm = T)
+  get_deffs_byvar(g)
   )
   }
   
@@ -72,14 +80,20 @@ intra_cor_ff <- foreach(k=1:length(param_vec), .combine=rbind) %do% {
 
 intra_cor_ff <- data.frame(intra_cor_ff)
 
+# betweenness(g)
+# closeness(g)
+# page_rank(g)[[1]]
+# transitivity(g, "local")
+# max_path_length(g)
+# degree(g)
+# eigen_centrality(g)$vector
+
 names_var <- c("betweenness","closeness","page_rank"
                          ,"clustering","max_path_length","eigen","degree")
 
 names_intra_cor_ff <- c( "fwprobs",
-                         paste("neigh_sim", names_var,sep="_"),
-                         paste("deg_homogeneity", names_var,sep="_"),
-                         paste("simple_neigh_sim", names_var,sep="_"),
-                         "simple_deg_homogeneity")
+                         paste("deff1", names_var,sep="_"),
+                         paste("deff2", names_var,sep="_"))
 
 names(intra_cor_ff) <- names_intra_cor_ff
 
@@ -87,7 +101,7 @@ intra_cor_ff_summary <- intra_cor_ff %>%
   group_by(fwprobs) %>%
   summarise_all(mean)
 
-saveRDS(intra_cor_ff_summary, "data/intra_cor_ff.rds")
+saveRDS(intra_cor_ff_summary, "data/intra_cor_ff_deffs.rds")
 
 ## For all graphs in igraphdata
 
@@ -104,28 +118,7 @@ intra_cor_real_graphs <- foreach(k=1:length(list_datasets), .combine=rbind) %do%
 
     c(
       names(list_datasets)[k],
-      mean(sapply(1:vcount(g), neigh_sim, graph_stat = betweenness(g)), na.rm = T),
-      mean(sapply(1:vcount(g), neigh_sim, graph_stat = closeness(g)), na.rm = T),
-      mean(sapply(1:vcount(g), neigh_sim, graph_stat = page_rank(g)[[1]]), na.rm = T),
-      mean(sapply(1:vcount(g), neigh_sim, graph_stat = transitivity(g, "local")), na.rm = T),
-      mean(sapply(1:vcount(g), neigh_sim, graph_stat = max_path_length(g)), na.rm = T),
-      mean(sapply(1:vcount(g), neigh_sim, graph_stat = degree(g)), na.rm = T),
-      mean(sapply(1:vcount(g), neigh_sim, graph_stat = eigen_centrality(g)$vector), na.rm = T),
-      mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = betweenness(g)), na.rm = T),
-      mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = closeness(g)), na.rm = T),
-      mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = page_rank(g)[[1]]), na.rm = T),
-      mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = transitivity(g, "local")), na.rm = T),
-      mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = max_path_length(g)), na.rm = T),
-      mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = degree(g)), na.rm = T),
-      mean(sapply(1:vcount(g), deg_homogeneity, graph_stat = eigen_centrality(g)$vector), na.rm = T),
-      mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = betweenness(g)), na.rm = T),
-      mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = closeness(g)), na.rm = T),
-      mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = page_rank(g)[[1]]), na.rm = T),
-      mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = transitivity(g, "local")), na.rm = T),
-      mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = max_path_length(g)), na.rm = T),
-      mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = degree(g)), na.rm = T),
-      mean(sapply(1:vcount(g), simple_neigh_sim, graph_stat = eigen_centrality(g)$vector), na.rm = T),
-      mean(sapply(1:vcount(g), simple_deg_homogeneity), na.rm = T)
+      get_deffs_byvar(g)
     )
   
 }
@@ -136,12 +129,55 @@ intra_cor_real_graphs <- data.frame(intra_cor_real_graphs)
 names_var <- c("betweenness","closeness","page_rank"
                ,"clustering","max_path_length","eigen","degree")
 
-names_intra_cor_real_graphs <- c( "fwprobs",
-                         paste("neigh_sim", names_var,sep="_"),
-                         paste("deg_homogeneity", names_var,sep="_"),
-                         paste("simple_neigh_sim", names_var,sep="_"),
-                         "simple_deg_homogeneity")
+names_intra_cor_real_graphs <- c( "graph_name",
+                         paste("deff1", names_var,sep="_"),
+                         paste("deff2", names_var,sep="_"))
 
 names(intra_cor_real_graphs) <- names_intra_cor_real_graphs
 
-saveRDS(intra_cor_real_graphs, "data/intra_cor_real_graphs.rds")
+saveRDS(intra_cor_real_graphs, "data/intra_cor_real_graphs_deffs.rds")
+
+
+## Barabasi-Albert
+  
+intra_cor_BA <-  foreach(j=1:nSimus, .combine=rbind) %do% {
+  g <- barabasi.game(N, directed = F)
+  c(
+    "BA",
+    get_deffs_byvar(g)
+  )
+}
+  
+
+names_var <- c("betweenness","closeness","page_rank"
+               ,"clustering","max_path_length","eigen","degree")
+
+intra_cor_BA <- data.frame(intra_cor_BA)
+intra_cor_BA[,2:ncol(intra_cor_BA)] <- apply(intra_cor_BA[,2:ncol(intra_cor_BA)], c(1,2), as.numeric)
+
+names_intra_cor_BA <- c( "name",
+                         paste("deff1", names_var,sep="_"),
+                         paste("deff2", names_var,sep="_"))
+
+names(intra_cor_BA) <- names_intra_cor_BA
+
+intra_cor_BA_summary <- intra_cor_BA
+# intra_cor_BA_summary$deff1_clustering <- 0
+# intra_cor_BA_summary$deff2_clustering <- 0
+
+intra_cor_BA_summary <- intra_cor_BA_summary %>%
+  group_by(name) %>%
+  summarise_all(mean)
+
+saveRDS(intra_cor_BA_summary, "data/intra_cor_BA_deffs.rds")
+
+#### Bind all deffs estimates
+
+
+deffs_networks <- rbind(intra_cor_ff_summary %>% rename(name=fwprobs),
+                        intra_cor_real_graphs %>% rename(name=graph_name),
+                        intra_cor_BA_summary)
+row.names(deffs_networks) <- NULL
+
+saveRDS(deffs_networks, "data/deffs_networks.rds")
+
