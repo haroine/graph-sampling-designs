@@ -18,3 +18,11 @@ NULL
 #' (bernoulli + auxiliary variables) for all stats of interest
 #' for yeast network
 NULL
+
+#' @name intra_cor_ff
+#' @description Intra correlation coefficient for forest fire with ambs = 1
+#' and fwprobs in seq(0.05,0.30,0.05)
+
+#' @name intra_cor_real_graphs
+#' @description Intra correlation coefficient for graphs datasets "Usairports",
+#' "" and "yeast" in igraphdata
