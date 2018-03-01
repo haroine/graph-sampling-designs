@@ -12,4 +12,6 @@ deff_tidy <- deff_tidy %>%
   mutate(deff=as.numeric(deff)) %>%
   arrange(graph_name, deff)
 
+deff_tidy$deff <- deff_tidy$deff + 1
+
 saveRDS(deff_tidy, "data/tidy_deffs_networks.rds")
