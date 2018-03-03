@@ -11,10 +11,8 @@ nSimus_sample <- 500
 n <- 50
 set.seed(1005192119)
 
-## TODO immuno
-
-data("immuno")
-g <- immuno
+# data("immuno")
+g <- barabasi.game(N, directed = F)
 
 ## Just for tests
 # list_X <- list(closeness(g), betweenness(g))
@@ -26,13 +24,13 @@ graph_stat <- list(closeness(g), betweenness(g), degree(g), page_rank(g)$vector,
 name_stat <- c("closeness", "betweenness", "degree"
                , "page_rank", "eigen", "clustering")
 
-parameter <- "immuno"
+parameter <- "BA"
 # method_first <- c("bernoulli")
 
 list_X <- list(NULL)
 method_first_vec <- c("bernoulli")
 
-immuno_estimators_bernoulli <- foreach(k=1:(length(list_X)), .combine=rbind) %do% {
+BA_estimators_bernoulli <- foreach(k=1:(length(list_X)), .combine=rbind) %do% {
     currentX <- list_X[[k]]
     current_name <- names(list_X)[k]
     method_first <- method_first_vec[k]
@@ -46,7 +44,7 @@ immuno_estimators_bernoulli <- foreach(k=1:(length(list_X)), .combine=rbind) %do
     
 }
 
-saveRDS(current_df, "data/immuno_estimators_bernoulli.rds")
+saveRDS(current_df, "data/BA_estimators_bernoulli.rds")
 
 ##### pps
 
@@ -61,7 +59,7 @@ name_stat <- c("closeness", "betweenness", "degree"
                , "page_rank", "eigen", "clustering")
 method_first_vec <- rep("poisson.pps", length(list_X))
 
-immuno_estimators_pps <- foreach(k=1:(length(list_X)), .combine=rbind) %do% {
+BA_estimators_pps <- foreach(k=1:(length(list_X)), .combine=rbind) %do% {
   currentX <- list_X[[k]]
   current_name <- names(list_X)[k]
   method_first <- method_first_vec[k]
@@ -75,7 +73,7 @@ immuno_estimators_pps <- foreach(k=1:(length(list_X)), .combine=rbind) %do% {
     
 }
 
-saveRDS(immuno_estimators_pps, "data/immuno_estimators_pps.rds")
+saveRDS(BA_estimators_pps, "data/BA_estimators_pps.rds")
 
 
   
