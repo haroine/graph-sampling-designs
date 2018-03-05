@@ -3,7 +3,7 @@ library(tidyverse)
 ff_estimators <- readRDS("data/forestfire_snowball.rds")
 estimators_stats <- ff_estimators
 
-df_toplot <- estimators_stats %>% filter(name=="eigen")
+df_toplot <- estimators_stats %>% filter(name=="bernoulli")
 # df_toplot$testvar <- df_toplot$deff_snowball / df_toplot$deff_simple
 # df_toplot <- estimators_stats
 
