@@ -19,7 +19,8 @@ plot_deff <- ggplot(data = df_toplot
   # geom_line(aes(y=deff_simple, colour=stat_name)) +
   geom_line(aes(y=deff_snowball, colour=stat_name)) +
   geom_hline(yintercept = 1, linetype="longdash") +
-  scale_y_log10() +
+  geom_hline(yintercept = 2, linetype="longdash") +
+  scale_y_log10(breaks=c(1,2,10,100)) +
   labs(title = "Design effect for snowball sampling",
        subtitle = "For a forest-fire networkof order 1000, initial sample drawn by Bernoulli of expected size 50",
        caption = "Ambassadors parameter for forest-fire = 1", 

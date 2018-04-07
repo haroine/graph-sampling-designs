@@ -27,11 +27,12 @@ deff_df$stat_name <- factor(deff_df$stat_name, levels=levels_stat_name)
 
 plot_deff_real <- ggplot(data=deff_df, aes(x=name)) +
   geom_point(aes(y=deff_snowball, colour=stat_name)) +
-  scale_y_log10() +
+  geom_hline(yintercept = 2, linetype="longdash") +
+  scale_y_log10(breaks=c(1,2,10,100)) +
   geom_hline(yintercept = 1, linetype="longdash", colour="black") +
-  labs(title = "",
-       subtitle = "",
-       caption = "",
+  labs(title = "Design effect for snowball sampling",
+       subtitle = "For 3 real-life graph dataset and simulations on a Barabasi-Albert (BA) model",
+       caption = "Graph datasets from R package igraphdata",
        x = "Graph name", y = "Design effect") 
 
 print(plot_deff_real)
