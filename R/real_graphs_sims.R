@@ -7,6 +7,7 @@ source("R/snowball.R")
 source("R/metrics.R")
 
 #### Model graph
+N <- 10000
 nSimus_sample <- 500
 n <- 50
 set.seed(1005192119)
