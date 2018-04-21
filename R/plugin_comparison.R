@@ -41,6 +41,7 @@ partial_forplugin <- foreach(k=1:length(name_stat), .combine=rbind) %do% {
     weighted_estimate <- sum(graph_stat_current[selected_vertices] * (weights), na.rm=T)  / size_est
     
     c(
+      real_stat_value,
       length(selected_vertices),
       plugin_estimate,
       (plugin_estimate - real_stat_value)**2,
@@ -61,10 +62,11 @@ result_forplugin <- data.frame(result_forplugin, stringsAsFactors = F)
 
 names(result_forplugin) <- c("initial_sample_size",
                              "graph_stat",
+                             "stat_value",
                              "snowball_sample_size",
                              "plugin_estimate", "MSE_plugin",
                              "bias_plugin","MAE_plugin",
                              "weighted_estimate", "MSE_weighted",
                              "bias_weighted","MAE_weighted")
 
-saveRDS(result_forplugin, "data/MSE_plugin_weighted.rds")
+saveRDS(result_forplugin, "data/MSE_plugin_weighted_2.rds")
